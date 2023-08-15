@@ -42,6 +42,8 @@
 		#endif
 	#endif
 
+	#define URTC_LIGHTWEIGHT
+
 	/**
 	 * \brief Default RTC I2C address
 	 *
@@ -306,12 +308,17 @@
 			uint8_t month();
 			uint8_t year();
 			uint8_t dayOfWeek();
+
+#if !defined(URTC_LIGHTWEIGHT)
 			int16_t temp();
+#endif // !URTC_LIGHTWEIGHT
+
 			void set(const uint8_t, const uint8_t, const uint8_t, const uint8_t, const uint8_t, const uint8_t, const uint8_t);
 			void set_rtc_address(const int);
 			void set_model(const uint8_t);
 			uint8_t model();
 
+#if !defined(URTC_LIGHTWEIGHT)
 			/******* Power ********/
 			bool lostPower();
 			void lostPowerClear();
@@ -352,7 +359,7 @@
 			bool enable32KOut();
 			bool disable32KOut();
 			bool status32KOut();
-
+#endif // !URTC_LIGHTWEIGHT
 
 		private:
 			// Address
@@ -366,11 +373,15 @@
 			uint8_t _month = 0;
 			uint8_t _year = 0;
 			uint8_t _dayOfWeek = 0;
+
+#if !defined(URTC_LIGHTWEIGHT)
 			int16_t _temp = 9999;
+#endif // !URTC_LIGHTWEIGHT
 
 			// Model, for alarms and RAM
 			uint8_t _model = URTCLIB_MODEL_DS3232;
 
+#if !defined(URTC_LIGHTWEIGHT)
 			// Alarms:
 			uint8_t _a1_mode = URTCLIB_ALARM_TYPE_1_NONE;
 			uint8_t _a1_second = 0;
@@ -396,7 +407,7 @@
 
 			// 32K output Flag
 			bool _32k = false;
-
+#endif // !URTC_LIGHTWEIGHT
 	};
 
 #endif

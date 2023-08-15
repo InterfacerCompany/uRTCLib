@@ -77,6 +77,9 @@ void uRTCLib::refresh() {
 	URTCLIB_WIRE.endTransmission();
 	uRTCLIB_YIELD
 
+#if defined(URTC_LIGHTWEIGHT)
+	URTCLIB_WIRE.requestFrom(_rtc_address, 7);
+#else
 	// Adjust requested bytes to selected model:
 	switch (_model) {
 		case URTCLIB_MODEL_DS1307:
@@ -89,6 +92,8 @@ void uRTCLib::refresh() {
 			URTCLIB_WIRE.requestFrom(_rtc_address, 19);
 			break;
 	}
+#endif // URTC_LIGHTWEIGHT
+
 	// 0x00h
 	_second = URTCLIB_WIRE.read() & 0b01111111;
 	uRTCLIB_YIELD
@@ -124,6 +129,7 @@ void uRTCLib::refresh() {
 	uRTCLIB_YIELD
 	_year = uRTCLIB_bcdToDec(_year);
 
+#if !defined(URTC_LIGHTWEIGHT)
 	_temp = URTCLIB_TEMP_ERROR; // Some obvious error value
 
 	// Now we need to read extra requested bytes depending on the RTC model again:
@@ -278,8 +284,10 @@ void uRTCLib::refresh() {
 			_temp = _temp * 25; // *25 is the same as number + 2bit (decimals) * 100 in base 10
 			break;
 	}
+#endif // !URTC_LIGHTWEIGHT
 }
 
+#if !defined(URTC_LIGHTWEIGHT)
 /**
  * \brief Returns lost power VBAT staus
  *
@@ -351,8 +359,6 @@ void uRTCLib::lostPowerClear() {
 			break;
 	}
 }
-
-
 
 /**
   *\brief Enable VBAT operation when VCC power is lost.
@@ -478,6 +484,7 @@ int16_t uRTCLib::temp() {
 	}
 	return _temp;
 }
+#endif // !URTC_LIGHTWEIGHT
 
 /**
  * \brief Returns actual second
@@ -634,6 +641,7 @@ void uRTCLib::set(const uint8_t second, const uint8_t minute, const uint8_t hour
 }
 
 
+#if !defined(URTC_LIGHTWEIGHT)
 
 /*************  Alarms: ****************/
 
@@ -1515,5 +1523,6 @@ bool uRTCLib::status32KOut() {
 	return _32k;
 }
 
+#endif // !URTC_LIGHTWEIGHT
 
 /*** EEPROM functionality has been moved to separate library: https://github.com/Naguissa/uEEPROMLib ***/
