@@ -24,7 +24,7 @@
 
 
 // uRTCLib rtc;
-uRTCLib rtc(0x68);
+uRTCLib rtc;
 
 
 void setup() {
@@ -32,11 +32,9 @@ delay (2000);
 	Serial.begin(9600);
 	Serial.println("Serial OK");
 
-	#ifdef ARDUINO_ARCH_ESP8266
-		URTCLIB_WIRE.begin(0, 2); // D3 and D4 on ESP8266
-	#else
-		URTCLIB_WIRE.begin();
-	#endif
+	Wire.begin();
+
+	rtc.begin(&Wire, 0x68, URTCLIB_MODEL_DS3232);
 
 	rtc.set(0, 42, 16, 6, 2, 5, 15);
 	//  RTCLib::set(byte second, byte minute, byte hour, byte dayOfWeek, byte dayOfMonth, byte month, byte year)
@@ -62,9 +60,6 @@ void loop() {
 
 	Serial.print(" DOW: ");
 	Serial.print(rtc.dayOfWeek());
-
-	Serial.print(" - Temp: ");
-	Serial.print(rtc.temp()  / 100);
 
 	Serial.println();
 

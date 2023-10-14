@@ -42,7 +42,6 @@ void printRTCDateISOFormat();
 
 void printRTCTime(bool aPrintLongFormat = true, bool aDoRefresh = false);
 
-void printRTCTemperature();
 bool requestDateBySerialAndSet(void);
 
 #if !defined(__AVR__) && ! defined(PROGMEM)
@@ -109,24 +108,13 @@ void setup() {
 		  // Just to know which program is running on my Arduino
 	Serial.println(F("START " __FILE__ "\r\nVersion " VERSION_EXAMPLE " from " __DATE__));
 
-	#ifdef ARDUINO_ARCH_ESP8266
-		URTCLIB_WIRE.begin(0, 2); // D3 and D4 on ESP8266
-	#else
-		URTCLIB_WIRE.begin();
-	#endif
+	Wire.begin();
 
-	rtc.set_rtc_address(0x68);
-	rtc.set_model(URTCLIB_MODEL_DS3232);
+	rtc.begin(&Wire, 0x68, URTCLIB_MODEL_DS3232);
 
 	// Only used once, then disabled
 	rtc.set(0, 42, 16, 6, 2, 5, 15);
 	//  RTCLib::set(byte second, byte minute, byte hour, byte dayOfWeek, byte dayOfMonth, byte month, byte year)
-
-	if (rtc.lostPower() || rtc.year() < 19) {
-		if (requestDateBySerialAndSet()) {
-			rtc.lostPowerClear();
-		}
-	}
 }
 
 void loop() {
@@ -274,12 +262,6 @@ void printRTCDate(uint8_t aDateFormatSpecifier) {
 // ISO Format
 		printRTCDateISOFormat();
 	}
-}
-
-void printRTCTemperature() {
-	Serial.print(rtc.temp() / 100);
-	Serial.print('.');
-	Serial.print(rtc.temp() - ((rtc.temp() / 100) * 100));
 }
 
 void printRTCTime(bool aPrintLongFormat, bool aDoRefresh) {

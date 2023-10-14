@@ -32,15 +32,7 @@
 	 */
 	#define URTCLIB
 	#include "Arduino.h"
-	#ifndef URTCLIB_WIRE
-		#if defined(ARDUINO_attiny) || defined(ARDUINO_AVR_ATTINYX4) || defined(ARDUINO_AVR_ATTINYX5) || defined(ARDUINO_AVR_ATTINYX7) || defined(ARDUINO_AVR_ATTINYX8) || defined(ARDUINO_AVR_ATTINYX61) || defined(ARDUINO_AVR_ATTINY43) || defined(ARDUINO_AVR_ATTINY828) || defined(ARDUINO_AVR_ATTINY1634) || defined(ARDUINO_AVR_ATTINYX313)
-			#include <TinyWireM.h>                  // I2C Master lib for ATTinys which use USI
-			#define URTCLIB_WIRE TinyWireM
-		#else
-			#include <Wire.h>
-			#define URTCLIB_WIRE Wire
-		#endif
-	#endif
+	#include <Wire.h>
 
 	#define URTC_LIGHTWEIGHT
 
@@ -299,6 +291,8 @@
 			uRTCLib(const int);
 			uRTCLib(const int, const uint8_t);
 
+			void begin(TwoWire* wire_p = &Wire, int rtc_address = URTCLIB_ADDRESS, uint8_t model = URTCLIB_MODEL_DS1307);
+
 			/******* RTC functions ********/
 			void refresh();
 			uint8_t second();
@@ -362,8 +356,9 @@
 #endif // !URTC_LIGHTWEIGHT
 
 		private:
-			// Address
-			int _rtc_address = URTCLIB_ADDRESS;
+
+			TwoWire* _wire_p;                   /**< Wire object pointer*/
+			int _rtc_address = URTCLIB_ADDRESS; // Address
 
 			// RTC read data
 			uint8_t _second = 0;
@@ -410,6 +405,6 @@
 #endif // !URTC_LIGHTWEIGHT
 	};
 
-#endif
+#endif // URTCLIB
 
 
